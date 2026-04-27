@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scalpanday — Trading de Précision</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C97A;
+    --gold-dim: #8B6D2E;
+    --black: #080808;
+    --black-2: #0F0F0F;
+    --black-3: #161616;
+    --black-4: #1E1E1E;
+    --white: #F5F0E8;
+    --white-dim: #A89F8E;
+    --border: rgba(201,168,76,0.18);
+    --border-strong: rgba(201,168,76,0.45);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Syne', sans-serif;
+    font-weight: 400;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CUSTOM CURSOR */
+  .cursor {
+    position: fixed;
+    width: 8px; height: 8px;
+    background: var(--gold);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease, width 0.3s ease, height 0.3s ease, background 0.3s ease;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 32px; height: 32px;
+    border: 1px solid rgba(201,168,76,0.5);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.15s ease, width 0.3s ease, height 0.3s ease;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 4rem;
+    background: linear-gradient(to bottom, rgba(8,8,8,0.95) 0%, transparent 100%);
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+  }
+
+  .logo-mark {
+    width: 36px;
+    height: 36px;
+  }
+
+  .logo-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    color: var(--white);
+    text-transform: uppercase;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    text-decoration: none;
+    color: var(--white-dim);
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    transition: color 0.3s;
+  }
+
+  .nav-links a:hover { color: var(--gold); }
+
+  /* HERO */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse at 50% 50%, black 30%, transparent 80%);
+  }
+
+  .hero-glow {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 70%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .hero-content {
+    position: relative;
+    max-width: 900px;
+  }
+
+  .hero-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .hero-label::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 1px;
+    background: var(--gold);
+  }
+
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3.5rem, 8vw, 7rem);
+    font-weight: 300;
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--gold-light);
+  }
+
+  .hero-subtitle {
+    font-size: 0.95rem;
+    color: var(--white-dim);
+    line-height: 1.8;
+    max-width: 520px;
+    margin-bottom: 3rem;
+    letter-spacing: 0.02em;
+  }
+
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 2.5rem;
+    border: 1px solid var(--border-strong);
+    color: var(--gold-light);
+    text-decoration: none;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    transition: all 0.4s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-cta::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gold);
+    transform: translateX(-100%);
+    transition: transform 0.4s ease;
+    z-index: -1;
+  }
+
+  .hero-cta:hover {
+    color: var(--black);
+    border-color: var(--gold);
+  }
+
+  .hero-cta:hover::before { transform: translateX(0); }
+
+  .hero-ticker {
+    position: absolute;
+    bottom: 3rem;
+    left: 4rem;
+    right: 4rem;
+    display: flex;
+    gap: 3rem;
+    border-top: 1px solid var(--border);
+    padding-top: 2rem;
+  }
+
+  .ticker-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .ticker-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+  }
+
+  .ticker-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    color: var(--white);
+    letter-spacing: 0.05em;
+  }
+
+  /* SECTIONS */
+  section {
+    padding: 8rem 4rem;
+    position: relative;
+  }
+
+  .section-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .section-label::before {
+    content: '';
+    width: 30px;
+    height: 1px;
+    background: var(--gold);
+  }
+
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 300;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+  }
+
+  .section-title em {
+    font-style: italic;
+    color: var(--gold-light);
+  }
+
+  /* PILIERS */
+  #piliers { background: var(--black-2); }
+
+  .piliers-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    margin-top: 5rem;
+    border: 1px solid var(--border);
+  }
+
+  .pilier {
+    padding: 3rem 2.5rem;
+    background: var(--black-2);
+    border-right: 1px solid var(--border);
+    transition: background 0.4s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .pilier:last-child { border-right: none; }
+
+  .pilier::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    transform: scaleX(0);
+    transition: transform 0.4s ease;
+  }
+
+  .pilier:hover { background: var(--black-3); }
+  .pilier:hover::before { transform: scaleX(1); }
+
+  .pilier-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 4rem;
+    font-weight: 300;
+    color: var(--border-strong);
+    line-height: 1;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.05em;
+  }
+
+  .pilier-title {
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1rem;
+  }
+
+  .pilier-text {
+    font-size: 0.85rem;
+    color: var(--white-dim);
+    line-height: 1.8;
+  }
+
+  /* METHODE */
+  #methode { background: var(--black); }
+
+  .methode-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    align-items: start;
+    margin-top: 4rem;
+  }
+
+  .methode-text {
+    font-size: 0.9rem;
+    color: var(--white-dim);
+    line-height: 2;
+  }
+
+  .methode-text p { margin-bottom: 1.5rem; }
+
+  .methode-text strong {
+    color: var(--gold-light);
+    font-weight: 500;
+  }
+
+  .methode-sessions {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .session {
+    padding: 2rem;
+    background: var(--black-3);
+    border: 1px solid var(--border);
+    position: relative;
+    transition: border-color 0.3s;
+  }
+
+  .session:hover { border-color: var(--border-strong); }
+
+  .session-market {
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+  }
+
+  .session-time {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.8rem;
+    font-weight: 300;
+    color: var(--white);
+    margin-bottom: 0.5rem;
+  }
+
+  .session-desc {
+    font-size: 0.8rem;
+    color: var(--white-dim);
+    line-height: 1.6;
+  }
+
+  .session-tag {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+  }
+
+  /* AXES */
+  #axes { background: var(--black-2); }
+
+  .axes-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-top: 5rem;
+  }
+
+  .axe {
+    padding: 3rem;
+    background: var(--black);
+    border: 1px solid var(--border);
+    position: relative;
+    transition: border-color 0.4s, transform 0.4s;
+  }
+
+  .axe:hover {
+    border-color: var(--border-strong);
+    transform: translateY(-4px);
+  }
+
+  .axe-icon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 2rem;
+  }
+
+  .axe-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.8rem;
+    color: var(--gold-dim);
+    letter-spacing: 0.2em;
+    margin-bottom: 1rem;
+  }
+
+  .axe-title {
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--white);
+    margin-bottom: 1rem;
+  }
+
+  .axe-text {
+    font-size: 0.83rem;
+    color: var(--white-dim);
+    line-height: 1.9;
+  }
+
+  .axe-detail {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+  }
+
+  /* ABOUT */
+  #about { background: var(--black); }
+
+  .about-layout {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 6rem;
+    align-items: start;
+    margin-top: 5rem;
+  }
+
+  .about-visual {
+    aspect-ratio: 3/4;
+    background: var(--black-3);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .about-visual-inner {
+    text-align: center;
+  }
+
+  .about-initials {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 5rem;
+    font-weight: 300;
+    color: var(--gold-dim);
+    line-height: 1;
+  }
+
+  .about-visual-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-top: 1rem;
+  }
+
+  .about-visual::after {
+    content: '';
+    position: absolute;
+    inset: 1rem;
+    border: 1px solid var(--border);
+    pointer-events: none;
+  }
+
+  .about-content {}
+
+  .about-quote {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.8rem;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--gold-light);
+    line-height: 1.4;
+    margin-bottom: 3rem;
+    padding-bottom: 3rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .about-text {
+    font-size: 0.88rem;
+    color: var(--white-dim);
+    line-height: 2;
+    margin-bottom: 1.2rem;
+  }
+
+  .about-values {
+    display: flex;
+    gap: 2rem;
+    margin-top: 3rem;
+    flex-wrap: wrap;
+  }
+
+  .about-value {
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border);
+  }
+
+  /* CONTACT */
+  #contact {
+    background: var(--black-3);
+    text-align: center;
+  }
+
+  .contact-inner {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .contact-inner .section-label {
+    justify-content: center;
+  }
+
+  .contact-inner .section-label::before { display: none; }
+
+  .contact-text {
+    font-size: 0.88rem;
+    color: var(--white-dim);
+    line-height: 1.9;
+    margin: 2rem 0 3rem;
+  }
+
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    text-align: left;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .form-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+  }
+
+  .form-input, .form-textarea {
+    background: var(--black);
+    border: 1px solid var(--border);
+    color: var(--white);
+    padding: 1rem 1.2rem;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color 0.3s;
+    width: 100%;
+    resize: none;
+  }
+
+  .form-input:focus, .form-textarea:focus {
+    border-color: var(--gold-dim);
+  }
+
+  .form-textarea { min-height: 120px; }
+
+  .form-submit {
+    align-self: flex-start;
+    margin-top: 1rem;
+    padding: 1rem 3rem;
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    color: var(--gold-light);
+    font-family: 'Syne', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    cursor: none;
+    transition: all 0.4s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .form-submit::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gold);
+    transform: translateX(-100%);
+    transition: transform 0.4s ease;
+    z-index: -1;
+  }
+
+  .form-submit:hover { color: var(--black); }
+  .form-submit:hover::before { transform: translateX(0); }
+
+  /* FOOTER */
+  footer {
+    padding: 3rem 4rem;
+    background: var(--black);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .footer-copy {
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    color: var(--white-dim);
+  }
+
+  .footer-tagline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.9rem;
+    color: var(--gold-dim);
+    font-style: italic;
+  }
+
+  /* DIVIDER LINE */
+  .gold-line {
+    position: absolute;
+    left: 4rem;
+    top: 0;
+    width: 60px;
+    height: 1px;
+    background: var(--gold);
+  }
+
+  /* SCROLL ANIMATIONS */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (max-width: 900px) {
+    nav { padding: 1.5rem 2rem; }
+    section { padding: 5rem 2rem; }
+    #hero { padding: 0 2rem; }
+    .piliers-grid { grid-template-columns: 1fr 1fr; }
+    .methode-layout { grid-template-columns: 1fr; gap: 3rem; }
+    .axes-grid { grid-template-columns: 1fr; }
+    .about-layout { grid-template-columns: 1fr; }
+    footer { flex-direction: column; gap: 1rem; text-align: center; }
+    .hero-ticker { flex-wrap: wrap; gap: 1.5rem; bottom: 2rem; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#hero" class="nav-logo">
+    <img src="data:image/png;base64,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" alt="Scalpanday" style="height:38px; width:auto; object-fit:contain;">
+  </a>
+  <ul class="nav-links">
+    <li><a href="#piliers">Piliers</a></li>
+    <li><a href="#methode">Méthode</a></li>
+    <li><a href="#axes">Structure</a></li>
+    <li><a href="#about">À propos</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <div class="hero-label">Trading de précision — DAX & Nasdaq</div>
+    <h1 class="hero-title">
+      La discipline<br>
+      comme <em>seul</em><br>
+      avantage.
+    </h1>
+    <p class="hero-subtitle">
+      Scalpanday est une structure de trading indépendant fondée sur le scalping et le daytrade. Chaque décision, chaque position, chaque sortie — construite sur la précision, jamais sur l'intuition seule.
+    </p>
+    <a href="#piliers" class="hero-cta">
+      Découvrir la méthode
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+  </div>
+  <div class="hero-ticker">
+    <div class="ticker-item">
+      <span class="ticker-label">Marché AM</span>
+      <span class="ticker-value">DAX 40</span>
+    </div>
+    <div class="ticker-item">
+      <span class="ticker-label">Marché PM</span>
+      <span class="ticker-value">Nasdaq 100</span>
+    </div>
+    <div class="ticker-item">
+      <span class="ticker-label">Style</span>
+      <span class="ticker-value">Scalp · Daytrade</span>
+    </div>
+    <div class="ticker-item">
+      <span class="ticker-label">Horizon</span>
+      <span class="ticker-value">Court / Moyen / Long</span>
+    </div>
+  </div>
+</section>
+
+<!-- PILIERS -->
+<section id="piliers">
+  <div class="gold-line"></div>
+  <div class="section-label">Les fondations</div>
+  <h2 class="section-title">Quatre <em>piliers</em>,<br>une seule direction.</h2>
+
+  <div class="piliers-grid">
+    <div class="pilier reveal">
+      <div class="pilier-num">01</div>
+      <div class="pilier-title">Patience</div>
+      <p class="pilier-text">Attendre le setup. Ne jamais forcer une entrée. Le marché offre des opportunités à celui qui sait attendre.</p>
+    </div>
+    <div class="pilier reveal">
+      <div class="pilier-num">02</div>
+      <div class="pilier-title">Précision</div>
+      <p class="pilier-text">Chaque trade repose sur une analyse multi-niveaux. Prix, volume, structure, confluences. Rien n'est laissé au hasard.</p>
+    </div>
+    <div class="pilier reveal">
+      <div class="pilier-num">03</div>
+      <div class="pilier-title">Discipline</div>
+      <p class="pilier-text">Respecter le plan de trading sans exception. La discipline n'est pas une contrainte — c'est la condition de la longévité.</p>
+    </div>
+    <div class="pilier reveal">
+      <div class="pilier-num">04</div>
+      <div class="pilier-title">Vision</div>
+      <p class="pilier-text">Lire les marchés sur trois horizons simultanément. Le court terme s'inscrit toujours dans le contexte du moyen et du long terme.</p>
+    </div>
+  </div>
+</section>
+
+<!-- MÉTHODE -->
+<section id="methode">
+  <div class="gold-line"></div>
+  <div class="section-label">L'approche</div>
+  <h2 class="section-title">Une méthode<br><em>construite</em> sur la structure.</h2>
+
+  <div class="methode-layout">
+    <div>
+      <div class="methode-text">
+        <p>La méthode Scalpanday repose sur la lecture de la <strong>structure de marché</strong> avant toute autre considération. Supports, résistances, points pivots, zones de liquidité — chaque session commence par une cartographie rigoureuse.</p>
+        <p>Le <strong>price action</strong> est la boussole principale. Les indicateurs viennent confirmer, jamais initier. Cette hiérarchie de l'information est non négociable.</p>
+        <p>La <strong>gestion du risque</strong> est définie avant d'entrer en position. Ratio R/R minimum, taille de position calculée, stop loss placé sur la structure — pas sur un chiffre arbitraire.</p>
+        <p>L'objectif à terme : systématiser les stratégies les plus robustes via des <strong>Expert Advisors MQL5</strong>, pour scaler l'activité sans sacrifier la rigueur.</p>
+        <p>Le compte opérationnel <strong>Blade Markets</strong> — entité rattachée à Scalpanday — est le terrain d'expression quotidien de cette méthode sur les indices intraday.</p>
+      </div>
+    </div>
+    <div class="methode-sessions">
+      <div class="session reveal">
+        <div class="session-market">Session du matin</div>
+        <div class="session-time">DAX 40</div>
+        <p class="session-desc">Ouverture de Francfort. Lecture des gaps, des niveaux overnight, positionnement selon le contexte macro européen.</p>
+        <div class="session-tag">08h00 – 11h30</div>
+      </div>
+      <div class="session reveal">
+        <div class="session-market">Session de l'après-midi</div>
+        <div class="session-time">Nasdaq 100</div>
+        <p class="session-desc">Ouverture Wall Street. Analyse des publications économiques US, réaction aux catalyseurs macro, momentum tech.</p>
+        <div class="session-tag">15h30 – 18h00</div>
+      </div>
+      <div class="session reveal">
+        <div class="session-market">Automatisation</div>
+        <div class="session-time">Expert Advisors</div>
+        <p class="session-desc">Développement d'EAs en MQL5 pour les stratégies validées. Backtesting rigoureux. Scaling sans intervention émotionnelle.</p>
+        <div class="session-tag">En développement</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AXES -->
+<section id="axes">
+  <div class="gold-line"></div>
+  <div class="section-label">La structure</div>
+  <h2 class="section-title">Trois <em>axes</em><br>de développement.</h2>
+
+  <div class="axes-grid">
+    <div class="axe reveal">
+      <svg class="axe-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="1" y="1" width="46" height="46" stroke="#C9A84C" stroke-width="0.75" opacity="0.3"/>
+        <polyline points="6,38 16,26 24,32 32,18 42,22" stroke="#C9A84C" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="32" cy="18" r="2.5" fill="#C9A84C"/>
+      </svg>
+      <div class="axe-num">Axe 01</div>
+      <div class="axe-title">Trading Actif</div>
+      <p class="axe-text">Scalping et daytrade quotidien sur les indices majeurs. DAX le matin, Nasdaq l'après-midi. Approche discrétionnaire fondée sur la structure de marché et le price action.</p>
+      <div class="axe-detail">DAX · Nasdaq · Price Action</div>
+    </div>
+    <div class="axe reveal">
+      <svg class="axe-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="1" y="1" width="46" height="46" stroke="#C9A84C" stroke-width="0.75" opacity="0.3"/>
+        <rect x="10" y="18" width="10" height="22" stroke="#C9A84C" stroke-width="1.2" fill="none"/>
+        <rect x="24" y="10" width="10" height="30" stroke="#C9A84C" stroke-width="1.2" fill="#C9A84C" fill-opacity="0.15"/>
+        <rect x="38" y="14" width="0" height="0"/>
+        <path d="M34 14 L38 10 L42 14" stroke="#C9A84C" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div class="axe-num">Axe 02</div>
+      <div class="axe-title">Automatisation EA</div>
+      <p class="axe-text">Développement d'Expert Advisors en MQL5 pour automatiser les stratégies les plus robustes. Backtesting, optimisation, déploiement progressif. Scaler sans multiplier le risque humain.</p>
+      <div class="axe-detail">MQL5 · MetaTrader 5 · Algo Trading</div>
+    </div>
+    <div class="axe reveal">
+      <svg class="axe-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="1" y="1" width="46" height="46" stroke="#C9A84C" stroke-width="0.75" opacity="0.3"/>
+        <circle cx="24" cy="18" r="6" stroke="#C9A84C" stroke-width="1.2" fill="none"/>
+        <circle cx="12" cy="34" r="4" stroke="#C9A84C" stroke-width="1.2" fill="none"/>
+        <circle cx="36" cy="34" r="4" stroke="#C9A84C" stroke-width="1.2" fill="none"/>
+        <line x1="24" y1="24" x2="14" y2="30" stroke="#C9A84C" stroke-width="1" opacity="0.6"/>
+        <line x1="24" y1="24" x2="34" y2="30" stroke="#C9A84C" stroke-width="1" opacity="0.6"/>
+      </svg>
+      <div class="axe-num">Axe 03</div>
+      <div class="axe-title">Club Deal</div>
+      <p class="axe-text">Structuration progressive d'un club deal Scalpanday pour intégrer des associés-investisseurs sélectionnés. Gouvernance rigoureuse, transparence totale sur les performances et la méthode.</p>
+      <div class="axe-detail">Investisseurs · Gouvernance · Structuration</div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="gold-line"></div>
+  <div class="section-label">Fondateur</div>
+  <h2 class="section-title"><em>Qui</em> est<br>Scalpanday ?</h2>
+
+  <div class="about-layout">
+    <div class="about-visual">
+      <img src="data:image/png;base64,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" alt="Scalpanday" style="width:85%; object-fit:contain; padding:2rem;">
+    </div>
+    <div class="about-content">
+      <div class="about-quote">"Le marché récompense ceux qui ont la discipline d'attendre, et le courage d'agir quand le moment vient."</div>
+      <p class="about-text">Scalpanday est une structure fondée par un trader indépendant dont la conviction est simple : les marchés financiers ne pardonnent pas l'improvisation. Chaque session est une équation à résoudre avec méthode, pas un pari à prendre avec l'instinct.</p>
+      <p class="about-text">La démarche est celle d'un praticien : des années passées à lire les marchés, à construire et déconstruire des stratégies, à comprendre pourquoi certains trades fonctionnent et d'autres non. Cette expérience forge une lecture des marchés que l'automatisation viendra ensuite amplifier — jamais remplacer.</p>
+      <p class="about-text">L'ambition de Scalpanday dépasse le trading personnel : construire une structure durable, reproductible, et ouverte à terme à des associés partageant les mêmes exigences.</p>
+      <div class="about-values">
+        <span class="about-value">Patience</span>
+        <span class="about-value">Précision</span>
+        <span class="about-value">Discipline</span>
+        <span class="about-value">Vision</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-inner">
+    <div class="section-label">Contact</div>
+    <h2 class="section-title" style="text-align:center;">Parlons<br><em>trading.</em></h2>
+    <p class="contact-text">Tu es trader, investisseur, développeur algo — ou simplement curieux de la démarche Scalpanday. Prends contact. Les échanges sérieux méritent une réponse sérieuse.</p>
+    <form class="contact-form" onsubmit="handleSubmit(event)">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+        <div class="form-group">
+          <label class="form-label">Nom</label>
+          <input type="text" class="form-input" placeholder="Votre nom" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" placeholder="votre@email.com" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Objet</label>
+        <input type="text" class="form-input" placeholder="Trading · Algo · Investissement · Autre">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Message</label>
+        <textarea class="form-textarea" placeholder="Votre message..." required></textarea>
+      </div>
+      <button type="submit" class="form-submit">Envoyer le message →</button>
+    </form>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-copy">© 2025 Scalpanday — Tous droits réservés</div>
+  <div class="footer-tagline">Patience · Précision · Discipline · Vision</div>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+  });
+
+  function animateRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.width = '12px';
+      cursor.style.height = '12px';
+      ring.style.width = '48px';
+      ring.style.height = '48px';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.width = '8px';
+      cursor.style.height = '8px';
+      ring.style.width = '32px';
+      ring.style.height = '32px';
+    });
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 100);
+      }
+    });
+  }, { threshold: 0.15 });
+  reveals.forEach(el => observer.observe(el));
+
+  // Nav gold line active
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-links a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 200) current = s.id;
+    });
+    navLinks.forEach(a => {
+      a.style.color = a.getAttribute('href') === '#' + current
+        ? 'var(--gold)'
+        : '';
+    });
+  });
+
+  // Form
+  function handleSubmit(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('.form-submit');
+    btn.textContent = 'Message envoyé ✓';
+    btn.style.color = 'var(--gold)';
+    setTimeout(() => { btn.textContent = 'Envoyer le message →'; btn.style.color = ''; }, 3000);
+  }
+</script>
+</body>
+</html>
