@@ -123,13 +123,16 @@ section { padding:8rem 4rem; position:relative; }
 }
 .hero-name {
   font-family:'Cormorant Garamond',serif;
-  font-size:clamp(3rem,9vw,8rem); font-weight:300;
-  letter-spacing:0.08em; line-height:1;
+  font-size:clamp(3rem,8.5vw,7.5rem); font-weight:300;
+  letter-spacing:0.06em; line-height:1;
   color:transparent;
   background: linear-gradient(135deg, var(--gold-l) 0%, var(--gold) 50%, var(--gold-d) 100%);
   -webkit-background-clip:text; background-clip:text;
   margin-bottom:3rem;
+  white-space:nowrap;
+  overflow:visible;
 }
+#hero { overflow:hidden; }
 .hero-sub {
   font-size:0.82rem; color:var(--grey); line-height:1.9;
   max-width:480px; margin-bottom:3.5rem; letter-spacing:0.01em;
